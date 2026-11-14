@@ -39,7 +39,6 @@ Projeto-de-Integra-o---Banco-de-dados/
 │   └── ETL.ipynb               # Pipeline ETL: leitura dos CSVs sujos, limpeza com Pandas e carga
 ├── diagramas/                  # Diagramas (Draw.io): fluxo ETL/ELT e Esquema Estrela
 ├── requirements.txt            # Dependências (pandas, sqlalchemy, psycopg2-binary, dbt-postgres, jupyter)
-├── requirements.lock.txt       # Versões exatas instaladas
 ├── .gitignore
 └── README.md
 ```
@@ -51,7 +50,7 @@ Projeto-de-Integra-o---Banco-de-dados/
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate          # Windows: .venv\Scripts\activate
-pip install -r requirements.txt    # ou requirements.lock.txt para as versões exatas
+pip install -r requirements.txt
 ```
 
 O servidor PostgreSQL precisa estar instalado e em execução separadamente.
