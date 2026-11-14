@@ -6,14 +6,14 @@ Este repositório centraliza o projeto prático de Engenharia e Análise de Dado
 
 O fluxo de integração do projeto organiza os dados em duas camadas principais de maturidade:
 
-* **Tabelas Sujas (Camada Bruta / *Staging*):** Correspondem aos dados originais extraídos diretamente dos arquivos CSV da ANP (`ca-2018-01.csv` a `ca-2020-02.csv`), sem alterações estruturais. Essa camada preserva inconsistências reais da fonte, como delimitadores por ponto e vírgula (`;`), valores decimais com vírgula, variações de *encoding* (`ISO-8859-1` / `UTF-8`), registros duplicados e ausência de colunas (como o `Valor de Compra` no 2º semestre de 2020). No pipeline **ELT**, esses dados são carregados integralmente como tabelas sujas no banco de dados antes da etapa de transformação.
+* **Tabelas Sujas (Camada Bruta / *Staging*):** Correspondem aos dados originais extraídos diretamente dos arquivos CSV da ANP (`dados/sujo/ca-2018-01.csv` a `ca-2020-02.csv`), sem alterações estruturais. Essa camada preserva inconsistências reais da fonte, como delimitadores por ponto e vírgula (`;`), valores decimais com vírgula, variações de *encoding* (`ISO-8859-1` / `UTF-8`), registros duplicados e ausência de colunas (como o `Valor de Compra` no 2º semestre de 2020). No pipeline **ELT**, esses dados são carregados integralmente como tabelas sujas no banco de dados antes da etapa de transformação.
 * **Tabelas Limpas (Camada Tratada / *Data Warehouse*):** Representam os dados após higienização, padronização de textos e datas, conversão de tipos numéricos, tratamento de valores nulos e criação de chaves substitutas (*surrogate keys*). No pipeline **ETL**, essa limpeza ocorre em memória via **Pandas** antes da carga; no **ELT**, ocorre via **SQL** dentro do próprio banco de dados, resultando nas tabelas finais do Esquema Estrela.
 
 ## Tecnologias e Ferramentas Utilizadas
 
 * **Python 3 & Pandas:** Utilizados como motor principal no pipeline **ETL** para leitura dos CSVs sujos, limpeza de strings, conversão de tipos, tratamento de nulos e modelagem das tabelas limpas em memória.
 * **Google Colab:** Ambiente em nuvem utilizado para o desenvolvimento, execução e documentação interativa dos notebooks de ETL e ELT.
-* **SQL & Banco de Dados Relacional (PostgreSQL / DuckDB):** Utilizado para armazenar tanto as tabelas sujas (*Staging*) quanto as tabelas limpas finais (**Data Warehouse**), além de executar toda a lógica de limpeza e transformação via SQL no pipeline **ELT**.
+* **SQL & Banco de Dados Relacional (PostgreSQL):** Utilizado para armazenar tanto as tabelas sujas (*Staging*) quanto as tabelas limpas finais (**Data Warehouse**), além de executar toda a lógica de limpeza e transformação via SQL no pipeline **ELT**.
 * **Draw.io:** Ferramenta empregada na elaboração dos diagramas de arquitetura do fluxo de dados (ETL vs. ELT) e da modelagem dimensional (Esquema Estrela).
 * **Git & GitHub:** Controle de versão distribuído para rastreabilidade das entregas individuais de cada integrante e centralização do código e relatórios.
 
@@ -29,59 +29,35 @@ O fluxo de integração do projeto organiza os dados em duas camadas principais 
 
 ## Disposição de Diretórios
 
-O repositório está estruturado conforme a organização local do projeto, separando os dados brutos/sujos, os notebooks de processamento, os scripts SQL, os diagramas e a documentação:
-
 ```text
 Projeto-de-Integra-o---Banco-de-dados/
 │
-├── dados/                            # Conjuntos de dados do projeto (sujos e limpos)
-│   ├── ca-2018-01.csv                # Base bruta (suja) - 1º semestre de 2018
-│   ├── ca-2018-02.csv                # Base bruta (suja) - 2º semestre de 2018
-│   ├── ca-2019-01.csv                # Base bruta (suja) - 1º semestre de 2019
-│   ├── ca-2019-02.csv                # Base bruta (suja) - 2º semestre de 2019
-│   ├── ca-2020-01.csv                # Base bruta (suja) - 1º semestre de 2020
-│   ├── ca-2020-02.csv                # Base bruta (suja) - 2º semestre de 2020
-│   └── limpos/                       # (Opcional) Tabelas limpas exportadas após o tratamento
-│
-├── diagramas/                        # Representações visuais elaboradas no Draw.io
-│   ├── fluxo_integracao.drawio       # Arquivo editável do fluxo ETL e ELT
-│   ├── fluxo_integracao.png          # Exportação visual da arquitetura
-│   ├── esquema_estrela.drawio        # Arquivo editável da modelagem dimensional
-│   └── esquema_estrela.png           # Exportação visual do Star Schema
-│
-├── docs/                             # Documentação e entregas textuais do projeto
-│   ├── relatorio_completo.pdf        # Relatório final (Modelagem, ETL vs. ELT, 3 Análises e Reflexões)
-│   └── dicionario_dados.md           # Descrição detalhada das tabelas sujas e limpas do DW
-│
-├── notebooks/                        # Pipelines desenvolvidos no Google Colab
-│   ├── 01_pipeline_etl.ipynb         # Leitura das bases sujas, limpeza com Pandas e carga das tabelas limpas
-│   └── 02_pipeline_elt.ipynb         # Carga das tabelas sujas (Staging) e limpeza via SQL no banco
-│
-├── sql/                              # Scripts SQL puros para reprodutibilidade
-│   ├── 01_ddl_tabelas_sujas_e_dw.sql # Criação das tabelas de staging (sujas) e do DW (limpas)
-│   ├── 02_transformacoes_elt.sql     # Queries de limpeza, tipagem e carga das tabelas limpas
-│   └── 03_consultas_insights.sql     # Queries analíticas dos 3 insights apresentados no relatório
-│
-└── README.md                         # Visão geral do projeto, estrutura e guia de execução
+├── dados/
+│   ├── sujo/                   # Camada bruta: CSVs originais da ANP (ca-2018-01 a ca-2020-02)
+│   └── limpo/                  # Tabelas limpas exportadas após o tratamento
+├── notebooks/
+│   └── ETL.ipynb               # Pipeline ETL: leitura dos CSVs sujos, limpeza com Pandas e carga
+├── diagramas/                  # Diagramas (Draw.io): fluxo ETL/ELT e Esquema Estrela
+├── requirements.txt            # Dependências (pandas, sqlalchemy, psycopg2-binary, dbt-postgres, jupyter)
+├── .gitignore
+└── README.md
 ```
+
+> Planejado e ainda não criado: notebook do ELT, scripts SQL (`sql/`), projeto dbt e documentação (`docs/`).
+
+## Ambiente Virtual
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate          # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+O servidor PostgreSQL precisa estar instalado e em execução separadamente.
 
 ## Como Executar o Projeto
 
-1. **Clone o repositório:**
-   ```bash
-   git clone https://github.com/SEU-USUARIO/Projeto-de-Integra-o---Banco-de-dados.git
-   ```
-
-2. **Verifique os dados na pasta `dados/`:**
-   * Os 6 arquivos semestrais brutos (`ca-2018-01.csv` até `ca-2020-02.csv`) servem como entrada para ambos os pipelines.
-
-3. **Configure o ambiente no Google Colab:**
-   * Faça o upload dos notebooks localizados na pasta `/notebooks` para o Google Colab.
-   * Conecte o Google Drive ou faça o upload dos arquivos da pasta `dados/` e configure a conexão com o banco de dados de destino.
-
-4. **Execute os Pipelines:**
-   * Rode **`01_pipeline_etl.ipynb`** para ler as bases sujas, aplicar toda a limpeza em memória com **Pandas** e carregar as tabelas limpas no Data Warehouse.
-   * Rode **`02_pipeline_elt.ipynb`** para carregar os CSVs diretamente como tabelas sujas (*staging*) no banco e executar os scripts SQL de limpeza para gerar as tabelas limpas.
-
-5. **Explore os Insights:**
-   * Utilize as queries disponíveis em `/sql/03_consultas_insights.sql` sobre as tabelas limpas para reproduzir as análises da Greve dos Caminhoneiros (2018), da Pandemia (2020) e da variação por bandeira.
+1. **Prepare o ambiente** conforme a seção anterior.
+2. **Dados de entrada:** os 6 CSVs brutos ficam em `dados/sujo/`.
+3. **Pipeline ETL:** execute `notebooks/ETL.ipynb` (Jupyter local ou Google Colab) para limpar com Pandas e carregar as tabelas limpas no PostgreSQL.
+4. **Pipeline ELT:** carregar os CSVs como tabelas sujas (*staging*) e transformar via SQL/dbt (a implementar).
