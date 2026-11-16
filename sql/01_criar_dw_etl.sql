@@ -25,8 +25,7 @@ CREATE TABLE IF NOT EXISTS dw_etl.dim_posto (
     cnpj CHAR(14) NOT NULL UNIQUE,
     razao_social TEXT NOT NULL,
     rua TEXT,
-    numero_rua TEXT,
-    complemento TEXT,
+    numero_rua TEXT,    
     bairro TEXT,
     cep CHAR(8)
 );
@@ -65,9 +64,6 @@ CREATE TABLE IF NOT EXISTS dw_etl.fato_preco (
     sk_bandeira INTEGER NOT NULL REFERENCES dw_etl.dim_bandeira (sk_bandeira),
     sk_localizacao INTEGER NOT NULL REFERENCES dw_etl.dim_localizacao (sk_localizacao),
     valor_venda NUMERIC(12, 4) NOT NULL CHECK (valor_venda > 0),
-    valor_compra NUMERIC(12, 4),
-    margem NUMERIC(12, 4),
-    fl_compra_maior_venda BOOLEAN NOT NULL,
     fl_outlier BOOLEAN NOT NULL,
     arquivo_origem TEXT NOT NULL,
     UNIQUE (sk_tempo, sk_posto, sk_produto)
