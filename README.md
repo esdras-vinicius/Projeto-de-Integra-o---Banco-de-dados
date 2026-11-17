@@ -21,7 +21,7 @@ O fluxo de integração do projeto organiza os dados em duas camadas principais 
 
 * **Fonte:** [Série Histórica de Preços de Combustíveis - ANP](https://www.gov.br/anp/pt-br/centrais-de-conteudo/dados-abertos/serie-historica-de-precos-de-combustiveis) (arquivos semestrais de `2018-01` a `2020-02`).
 * **Arquitetura do Data Warehouse (Tabelas Limpas em Esquema Estrela):**
-  * **`fato_precos` (Tabela Fato):** Métricas de `valor_venda`, `valor_compra`, margem estimada e chaves estrangeiras para as dimensões.
+  * **`fato_preco` (Tabela Fato):** Grão de um preço por data, posto e produto. Contém a métrica `valor_venda`, a flag de qualidade `fl_outlier`, o `arquivo_origem` de cada registro e as chaves estrangeiras para as dimensões (`sk_tempo`, `sk_posto`, `sk_produto`, `sk_bandeira`, `sk_localizacao`).
   * **`dim_tempo` (Dimensão):** Data da coleta, ano, semestre, trimestre, mês e classificação do período histórico (ex.: *Pré-Greve*, *Greve 2018*, *Normalidade 2019*, *Pandemia 2020*).
   * **`dim_produto` (Dimensão):** Tipo de combustível (Gasolina Comum, Aditivada, Etanol, Diesel, Diesel S10) e unidade de medida.
   * **`dim_localizacao` (Dimensão):** Região, Unidade Federativa (UF) e Município.
