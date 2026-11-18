@@ -1,0 +1,50 @@
+version: 2
+
+models:
+  - name: dim_tempo
+    columns:
+      - name: sk_tempo
+        data_tests: [unique, not_null]
+      - name: data
+        data_tests: [unique, not_null]
+
+  - name: dim_posto
+    columns:
+      - name: sk_posto
+        data_tests: [unique, not_null]
+      - name: cnpj
+        data_tests: [unique, not_null]
+
+  - name: dim_localizacao
+    columns:
+      - name: sk_localizacao
+        data_tests: [unique, not_null]
+
+  - name: dim_produto
+    columns:
+      - name: sk_produto
+        data_tests: [unique, not_null]
+
+  - name: dim_bandeira
+    columns:
+      - name: sk_bandeira
+        data_tests: [unique, not_null]
+
+  - name: fato_preco
+    columns:
+      - name: id_preco
+        data_tests: [unique, not_null]
+      - name: sk_tempo
+        data_tests: [not_null]
+      - name: sk_posto
+        data_tests: [not_null]
+      - name: sk_produto
+        data_tests: [not_null]
+      - name: sk_bandeira
+        data_tests: [not_null]
+      - name: sk_localizacao
+        data_tests: [not_null]
+      - name: valor_venda
+        data_tests: [not_null]
+      - name: fl_outlier
+        data_tests: [not_null]
