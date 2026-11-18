@@ -1,0 +1,30 @@
+version: 2
+
+sources:
+  - name: anp_bruto
+    description: >
+      CSVs semestrais da ANP (2018 a 2020) carregados sem nenhum tratamento
+      pelo notebooks/ELT.ipynb. Todas as colunas são TEXT.
+    schema: raw_anp
+    tables:
+      - name: ca_2018_01
+      - name: ca_2018_02
+      - name: ca_2019_01
+      - name: ca_2019_02
+      - name: ca_2020_01
+      - name: ca_2020_02
+
+models:
+  - name: stg_precos_unificados
+    description: >
+      Os seis semestres crus empilhados em uma única tabela, ainda sem limpeza.
+      Acrescenta apenas arquivo_origem, no mesmo formato usado pelo ETL.
+    columns:
+      - name: arquivo_origem
+        description: "Nome do CSV de onde veio a linha, por exemplo ca-2018-01.csv."
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['ca-2018-01.csv', 'ca-2018-02.csv', 'ca-2019-01.csv',
+                         'ca-2019-02.csv', 'ca-2020-01.csv', 'ca-2020-02.csv']
