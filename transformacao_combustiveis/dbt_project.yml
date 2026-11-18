@@ -34,3 +34,14 @@ models:
     # Tudo em models/staging/ vira view (camada intermediária, não precisa ser gravada)
     staging:
       +materialized: view
+    # Limpeza, dimensões e fato são gravadas como tabelas de verdade
+    marts:
+      +materialized: table
+
+seeds:
+  transformacao_combustiveis:
+    de_para_bandeira:
+      +delimiter: ";"
+      +column_types:
+        bandeira_original: text
+        bandeira_padronizada: text

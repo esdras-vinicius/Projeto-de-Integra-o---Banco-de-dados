@@ -1,0 +1,82 @@
+version: 2
+
+# Testes equivalentes às validações da etapa 9 do ETL.ipynb:
+# chaves das dimensões sem nulo e sem repetição, e toda coleta da fato
+# apontando para uma linha que existe em cada dimensão.
+
+models:
+  - name: int_precos_preparados
+    description: "Coletas limpas: espaços, CNPJ, CEP, S/N, data, preço, bandeira e outliers."
+
+  - name: dim_tempo
+    description: "Um dia por linha, de 2018-01-01 a 2020-12-31."
+    columns:
+      - name: sk_tempo
+        data_tests: [unique, not_null]
+
+  - name: dim_posto
+    description: "Um posto por CNPJ, com o cadastro da coleta mais recente."
+    columns:
+      - name: sk_posto
+        data_tests: [unique, not_null]
+      - name: cnpj
+        data_tests: [unique, not_null]
+
+  - name: dim_localizacao
+    description: "Região, UF e município."
+    columns:
+      - name: sk_localizacao
+        data_tests: [unique, not_null]
+
+  - name: dim_produto
+    description: "Combustível e unidade de medida."
+    columns:
+      - name: sk_produto
+        data_tests: [unique, not_null]
+
+  - name: dim_bandeira
+    description: "Bandeira original do CSV e bandeira padronizada pelo de-para."
+    columns:
+      - name: sk_bandeira
+        data_tests: [unique, not_null]
+
+  - name: fato_preco
+    description: "Uma coleta por linha: data, posto e produto."
+    columns:
+      - name: sk_tempo
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_tempo')
+                field: sk_tempo
+      - name: sk_posto
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_posto')
+                field: sk_posto
+      - name: sk_produto
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_produto')
+                field: sk_produto
+      - name: sk_bandeira
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_bandeira')
+                field: sk_bandeira
+      - name: sk_localizacao
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_localizacao')
+                field: sk_localizacao
+      - name: valor_venda
+        data_tests: [not_null]
