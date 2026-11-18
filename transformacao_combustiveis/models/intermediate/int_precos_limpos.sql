@@ -8,7 +8,7 @@ WITH base_limpa AS (
         NULLIF(TRIM(nome_rua), '') AS rua,
         REGEXP_REPLACE(
             UPPER(COALESCE(NULLIF(TRIM(numero_rua), ''), 'S/N')),
-            '^(?:S\s*/?\s*N\.?\s*[ºO]?|SNR|SN)$',
+            '^(?:S\s*/?\s*N\.?\s*[º°O]?|SNR|SN)$',
             'S/N'
         ) AS numero_rua,
         NULLIF(TRIM(bairro), '') AS bairro,
