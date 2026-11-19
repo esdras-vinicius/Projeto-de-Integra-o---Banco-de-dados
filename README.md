@@ -16,9 +16,8 @@ O fluxo de integração do projeto organiza os dados em duas camadas principais 
 ## Tecnologias e Ferramentas Utilizadas
 
 * **Python 3 & Pandas:** Utilizados como motor principal no pipeline **ETL** para leitura dos CSVs sujos, limpeza de strings, conversão de tipos, tratamento de nulos e modelagem das tabelas limpas em memória.
-* **Google Colab:** Ambiente em nuvem utilizado para o desenvolvimento, execução e documentação interativa dos notebooks de ETL e ELT.
+* **Jupyter Notebook (VS Code):** Ambiente usado para o desenvolvimento, a execução e a documentação interativa dos notebooks de ETL e ELT, rodando localmente na máquina de cada integrante, junto com o PostgreSQL.
 * **SQL & Banco de Dados Relacional (PostgreSQL):** Utilizado para armazenar tanto as tabelas sujas (*Staging*) quanto as tabelas limpas finais (**Data Warehouse**), além de executar toda a lógica de limpeza e transformação via SQL no pipeline **ELT**.
-* **Draw.io:** Ferramenta empregada na elaboração dos diagramas de arquitetura do fluxo de dados (ETL vs. ELT) e da modelagem dimensional (Esquema Estrela).
 * **Git & GitHub:** Controle de versão distribuído para rastreabilidade das entregas individuais de cada integrante e centralização do código e relatórios.
 
 ---
@@ -28,10 +27,11 @@ O fluxo de integração do projeto organiza os dados em duas camadas principais 
 * **Fonte:** [Série Histórica de Preços de Combustíveis - ANP](https://www.gov.br/anp/pt-br/centrais-de-conteudo/dados-abertos/serie-historica-de-precos-de-combustiveis) (arquivos semestrais de `2018-01` a `2020-02`).
 * **Arquitetura do Data Warehouse (Tabelas Limpas em Esquema Estrela):**
   * **`fato_preco` (Tabela Fato):** Grão de um preço por data, posto e produto. Contém a métrica `valor_venda`, a flag de qualidade `fl_outlier`, o `arquivo_origem` de cada registro e as chaves estrangeiras para as dimensões (`sk_tempo`, `sk_posto`, `sk_produto`, `sk_bandeira`, `sk_localizacao`).
-  * **`dim_tempo` (Dimensão):** Data da coleta, ano, semestre, trimestre, mês e classificação do período histórico (ex.: *Pré-Greve*, *Greve 2018*, *Normalidade 2019*, *Pandemia 2020*).
-  * **`dim_produto` (Dimensão):** Tipo de combustível (Gasolina Comum, Aditivada, Etanol, Diesel, Diesel S10) e unidade de medida.
+  * **`dim_tempo` (Dimensão):** Data da coleta, ano, semestre, trimestre, mês e classificação do período histórico (*Pré-Greve 2018*, *Greve Caminhoneiros 2018*, *Normalidade 2018-2019* e *Pandemia 2020*).
+  * **`dim_produto` (Dimensão):** Tipo de combustível (Gasolina, Gasolina Aditivada, Etanol, Diesel, Diesel S10 e GNV) e unidade de medida (R$/litro ou R$/m³ no GNV).
   * **`dim_localizacao` (Dimensão):** Região, Unidade Federativa (UF) e Município.
-  * **`dim_posto` (Dimensão):** CNPJ da revenda, razão social, bandeira (Branca, Petrobras/Vibra, Ipiranga, Raízen/Shell, etc.), bairro e CEP.
+  * **`dim_posto` (Dimensão):** CNPJ da revenda, razão social, endereço (rua, número e bairro) e CEP, com o cadastro mais recente de cada posto.
+  * **`dim_bandeira` (Dimensão):** Bandeira original, bandeira padronizada (após o de/para) e indicador de posto sem bandeira (`fl_branca`). Fica ligada à fato, porque um posto pode trocar de bandeira ao longo do tempo.
 
 ---
 
