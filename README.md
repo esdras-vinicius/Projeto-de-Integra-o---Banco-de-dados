@@ -129,8 +129,6 @@ O resultado esperado é `so_no_etl` e `so_no_elt` iguais a 0 em todas as tabelas
  
 As consultas SQL na pasta `/analysis` mostram o que o modelo em estrela permite responder:
  
-1. **Insight 1:** descrição insight.
-2. **Insight 2:** descrição insight.
-3. **Insight 3:** descrição insight.
-
-> **Insights:** _preencher depois de rodar as consultas._
+1. **Preço por período histórico:** A greve teve o preço mais alto, a pandemia o mais baixo.
+2. **Postos por bandeira:** o maior grupo é o dos postos sem bandeira.
+3. **Coletas por ano:** 2020 tem 28% menos preços coletados.
