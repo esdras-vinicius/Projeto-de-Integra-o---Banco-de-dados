@@ -38,6 +38,10 @@ O fluxo de integração do projeto organiza os dados em duas camadas principais 
 ## Disposição de Diretórios
 ```text
 Projeto-de-Integra-o---Banco-de-dados/
+├── analysis/                          # Scripts SQL com as análises finais (Insights)
+│   └── preco_por_periodo_historico.sql/
+│   └── cidades_gasolina_mais_cara_e_barata.sql/
+│   └── postos_por_bandeira.sql/
 ├── dados/
 │   └── sujo/                          # CSVs brutos da ANP (ca-2018-01 a ca-2020-02)
 ├── notebooks/
@@ -130,5 +134,5 @@ O resultado esperado é `so_no_etl` e `so_no_elt` iguais a 0 em todas as tabelas
 As consultas SQL na pasta `/analysis` mostram o que o modelo em estrela permite responder:
  
 1. **Preço por período histórico:** A greve teve o preço mais alto, a pandemia o mais baixo.
-2. **Postos por bandeira:** o maior grupo é o dos postos sem bandeira.
-3. **Coletas por ano:** 2020 tem 28% menos preços coletados.
+2. **Cidades mais caras e mais baratas:** R$ 1,36 de diferença por litro.
+3. **Postos por bandeira:** o maior grupo é o dos postos sem bandeira.
