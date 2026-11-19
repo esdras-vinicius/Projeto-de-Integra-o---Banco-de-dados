@@ -79,53 +79,141 @@ Projeto-de-Integra-o---Banco-de-dados/
 
 ---
 
-## Ambiente Virtual
-
-```bash
-python3 -m venv .venv
-source .venv/bin/activate          # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
-```
-
-O servidor PostgreSQL precisa estar instalado e em execução separadamente.
-
----
-
 ## Como Executar o Projeto
- 
-### Pré-requisitos
- 
-1. Instale Python 3.10+ e PostgreSQL, e crie um banco vazio (ex.: `anp_dw`).
-2. Clone este repositório e instale as dependências:
+
+O projeto roda localmente: os notebooks (Jupyter) e o banco (PostgreSQL) ficam na sua máquina. A ordem é sempre **ETL primeiro, depois ELT**, e no fim a comparação entre os dois.
+
+### 1. Instalar os programas
+
+1. **Python 3.10 ou mais novo** (no Windows, marque "Add Python to PATH" na instalação).
+2. **PostgreSQL** (versão 14 ou mais nova). Na instalação, anote a senha que você escolher para o usuário `postgres`.
+3. **VS Code**, com as extensões **Python** e **Jupyter** (aba Extensões, `Ctrl+Shift+X`).
+4. **Git**, para clonar o repositório.
+
+### 2. Baixar o projeto e instalar as bibliotecas
+
+Abra um terminal (no Windows, o **PowerShell**) e rode:
+
+```bash
+git clone https://github.com/esdras-vinicius/Projeto-de-Integra-o---Banco-de-dados.git
+cd Projeto-de-Integra-o---Banco-de-dados
+python -m venv .venv
+```
+
+Ative o ambiente virtual:
+
+```bash
+# Windows (PowerShell)
+.venv\Scripts\activate
+# Mac / Linux
+source .venv/bin/activate
+```
+
+E instale as bibliotecas (pandas, SQLAlchemy, psycopg2, dbt, Jupyter):
+
 ```bash
 pip install -r requirements.txt
 ```
-3. Defina a conexão por variáveis de ambiente, no terminal em que abrir o Jupyter:
+
+### 3. Criar o banco vazio
+
 ```bash
-export PGHOST=localhost PGDATABASE=anp_dw PGUSER=postgres PGPASSWORD=sua_senha
+# Windows (troque 18 pela sua versão do PostgreSQL)
+& "C:\Program Files\PostgreSQL\18\bin\psql.exe" -U postgres -h localhost -c "CREATE DATABASE anp_dw;"
+# Mac / Linux
+psql -U postgres -h localhost -c "CREATE DATABASE anp_dw;"
 ```
-   (Windows PowerShell: `$env:PGHOST="localhost"` e assim por diante.)
- 
-### Passo 1: Pipeline ETL
- 
-Execute `notebooks/ETL.ipynb`. Ele limpa os CSVs de `dados/sujo/` com Pandas e grava o Data Warehouse no schema `dw_etl`.
- 
-### Passo 2: Pipeline ELT
- 
-1. Execute as seções 1 a 7 de `notebooks/ELT.ipynb`. Elas carregam os CSVs, sem tratamento, no schema `raw_anp`.
-2. Configure o `profiles.yml` do dbt (`~/.dbt/`) com o profile `transformacao_combustiveis`, usando `schema: dw_elt`, e rode:
+
+### 4. Informar a conexão com o banco
+
+Os notebooks leem a conexão de **variáveis de ambiente**. Defina-as no mesmo terminal do passo 2 (com o `.venv` ativo), trocando `sua_senha` pela senha do PostgreSQL:
+
+```bash
+# Windows (PowerShell)
+$env:PGHOST="localhost"; $env:PGPORT="5432"; $env:PGDATABASE="anp_dw"; $env:PGUSER="postgres"; $env:PGPASSWORD="sua_senha"
+# Mac / Linux
+export PGHOST=localhost PGPORT=5432 PGDATABASE=anp_dw PGUSER=postgres PGPASSWORD=sua_senha
+```
+
+Depois abra o VS Code **a partir desse terminal**, para que ele enxergue as variáveis:
+
+```bash
+code .
+```
+
+> Se o VS Code já estiver aberto, feche-o por completo e abra de novo com `code .`. Variáveis definidas depois que ele abriu não chegam aos notebooks.
+
+O ELT também usa o **dbt**, que tem o próprio arquivo de conexão. Crie o arquivo `profiles.yml` na pasta `.dbt` do seu usuário (Windows: `C:\Users\SEU_USUARIO\.dbt\profiles.yml`; Mac/Linux: `~/.dbt/profiles.yml`) com este conteúdo:
+
+```yaml
+transformacao_combustiveis:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: localhost
+      port: 5432
+      user: postgres
+      password: sua_senha
+      dbname: anp_dw
+      schema: dw_elt
+      threads: 4
+```
+
+> Esse arquivo fica fora do repositório, porque tem senha. Não o coloque na pasta do projeto.
+
+### 5. Rodar o ETL
+
+No VS Code, abra `notebooks/ETL.ipynb`. No canto superior direito, em **Select Kernel**, escolha o Python do `.venv`. Depois clique em **Run All**.
+
+O notebook lê os CSVs de `dados/sujo/`, faz toda a limpeza com Pandas e grava o Data Warehouse no schema `dw_etl`. No fim, a seção 12 mostra a tabela fato com **2.686.331 linhas**.
+
+### 6. Rodar o ELT
+
+Abra `notebooks/ELT.ipynb`, escolha o mesmo kernel e clique em **Run All**.
+
+- As seções 1 a 7 carregam os CSVs **sem tratamento** no schema `raw_anp`.
+- A seção 8 chama o dbt, que faz a limpeza em SQL dentro do banco e cria o Data Warehouse no schema `dw_elt`. Ela fica alguns minutos sem mostrar nada; é normal.
+- A seção 9 compara o tamanho das tabelas dos dois schemas.
+
+Se preferir rodar o dbt pelo terminal (com o `.venv` ativo):
+
 ```bash
 cd transformacao_combustiveis
 dbt build
+cd ..
 ```
- 
-### Passo 3: Comparar ETL × ELT
- 
+
+O resultado esperado é `PASS=36` (8 modelos e 28 testes).
+
+### 7. Comparar ETL × ELT
+
+Na pasta do projeto, rode:
+
 ```bash
-psql -U postgres -d anp_dw -f sql/02_comparar_etl_elt.sql
+# Windows
+& "C:\Program Files\PostgreSQL\18\bin\psql.exe" -U postgres -h localhost -d anp_dw -f sql/02_comparar_etl_elt.sql
+# Mac / Linux
+psql -U postgres -h localhost -d anp_dw -f sql/02_comparar_etl_elt.sql
 ```
- 
-O resultado esperado é `so_no_etl` e `so_no_elt` iguais a 0 em todas as tabelas.
+
+O resultado esperado é `so_no_etl` e `so_no_elt` iguais a **0** em todas as tabelas: os dois pipelines geram exatamente o mesmo Data Warehouse.
+
+### 8. Rodar as análises
+
+As consultas das análises estão na pasta `analysis/` e rodam do mesmo jeito, por exemplo:
+
+```bash
+psql -U postgres -h localhost -d anp_dw -f analysis/preco_por_periodo_historico.sql
+```
+
+### Para rodar de novo do zero
+
+O ETL se recusa a gravar em tabelas que já têm dados, para não duplicar linhas. Para recomeçar, apague os schemas e repita a partir do passo 5:
+
+```bash
+psql -U postgres -h localhost -d anp_dw -c "DROP SCHEMA IF EXISTS raw_anp, dw_etl, dw_elt CASCADE;"
+```
 
 ---
 
